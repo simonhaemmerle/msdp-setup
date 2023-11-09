@@ -1,0 +1,6 @@
+spec:
+  name: MSDP_TEST
+  stackable_version: "23.7"
+  location: de/fra
+  cpu_family: "INTEL_SKYLAKE"
+  node_count: 5
