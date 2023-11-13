@@ -46,3 +46,26 @@ terraform destroy
 ```
 
 >**Info:** You can run the same commands in the same order in your Gitlab pipeline or Github action and maybe separate them into different stages / jobs.
+
+### Other ways to manage your MSDP clusters
+
+- [ionosctl](https://docs.ionos.com/cli-ionosctl/subcommands/managed-stackable-data-platform)
+- [OpenAPI specification](https://api.ionos.com/docs/dataplatform/v1/)
+
+## Accessing the MSDP cluster
+
+After following the steps above you should find a `kubeconfig.yaml` in the `terraform` folder of your local respository.
+
+> Letting Terraform write a kubeconfig file to your local machine poses a potential security risk. Please use with caution.
+
+Tools like [*kubectl*](https://kubernetes.io/docs/tasks/tools/), [*k9s*](https://github.com/derailed/k9s), [*helm*](https://helm.sh/) and others need to work in the correct context to address the correct Kubernetes cluster. An easy way to set this context is to define the environment variable `$KUBECONFIG` and let it point to the `kubeconfig.yaml`.
+
+```shell
+export KUBECONFIG=${PWD}/terraform/kubeconfig.yaml
+```
+
+You can validate if you can access your MSDP cluster by starting `k9s` or by doing something simple like listing the nodes of the cluster:
+
+```shell
+kubectl get nodes
+```

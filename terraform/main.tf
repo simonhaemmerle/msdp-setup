@@ -36,11 +36,11 @@ resource "ionoscloud_datacenter" "datacenter" {
 
 # https://registry.terraform.io/providers/ionos-cloud/ionoscloud/latest/docs/resources/dataplatform_cluster
 resource "ionoscloud_dataplatform_cluster" "cluster" {
-  datacenter_id           =  ionoscloud_datacenter.datacenter.id
-  name                     = yamldecode(file("${var.cluster_description}"))["spec"]["name"]
+  datacenter_id          =  ionoscloud_datacenter.datacenter.id
+  name                   = yamldecode(file("${var.cluster_description}"))["spec"]["name"]
   maintenance_window {
     day_of_the_week      = "Sunday"
-    time                = "09:00:00"
+    time                 = "09:00:00"
   }
   version = yamldecode(file("${var.cluster_description}"))["spec"]["stackable_version"]
 }
@@ -51,8 +51,8 @@ resource "ionoscloud_dataplatform_node_pool" "nodepool" {
   name              = yamldecode(file("${var.cluster_description}"))["spec"]["name"]
   node_count        = yamldecode(file("${var.cluster_description}"))["spec"]["node_count"]
   cpu_family        = yamldecode(file("${var.cluster_description}"))["spec"]["cpu_family"]
-  cores_count       = 8
-  ram_size          = 16384
+  cores_count       = 4
+  ram_size          = 8192
   availability_zone = "AUTO"
   storage_type      = "SSD"
   storage_size      = 100
@@ -60,4 +60,14 @@ resource "ionoscloud_dataplatform_node_pool" "nodepool" {
     day_of_the_week = "Monday"
     time            = "09:00:00"
   }
+}
+
+data "ionoscloud_dataplatform_cluster" "cluster" {
+  id = ionoscloud_dataplatform_cluster.cluster.id
+}
+
+# https://registry.terraform.io/providers/ionos-cloud/ionoscloud/latest/docs/data-sources/dataplatform_cluster#example-of-dumping-the-kube_config-raw-data-into-a-yaml-file
+resource "local_sensitive_file" "kubeconfig" {
+    content       = yamlencode(jsondecode(data.ionoscloud_dataplatform_cluster.cluster.kube_config))
+    filename      = "kubeconfig.yaml"
 }
