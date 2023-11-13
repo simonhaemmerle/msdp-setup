@@ -1,0 +1,4 @@
+auth:
+  database: superset
+  username: superset
+  password: pw123

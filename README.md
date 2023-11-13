@@ -69,3 +69,35 @@ You can validate if you can access your MSDP cluster by starting `k9s` or by doi
 ```shell
 kubectl get nodes
 ```
+
+## Prerequisites
+
+For the prerequisites we are installing a Postgres database using a helm chart.
+
+```shell
+helm install pg-superset -f prerequisites/pg-superset.yaml oci://registry-1.docker.io/bitnamicharts/postgresql
+```
+
+## Example deployment
+
+To perform an example deployment using the Superset operator we can simply pass the custom resources like so:
+
+```shell
+kubectl apply -f resources/superset.yaml
+```
+
+To visit the Superset UI simply run `stackablectl services list` to get the correct endpoint. For more infos on stackablectl visit https://github.com/stackabletech/stackablectl.
+
+## Tidying up
+
+```shell
+kubectl delete -f resources/superset.yaml
+```
+
+```shell
+helm delete pg-superset
+```
+
+```shell
+kubectl delete pvc --all
+```
