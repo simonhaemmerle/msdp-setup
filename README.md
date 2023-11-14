@@ -8,7 +8,7 @@ You also need to make sure that the user you plan to use for terraforming is eit
 
 Then run `ionosctl login` to login with your credentials and `ionosctl token generate` to retrieve a token.
 
-Now we need to set two environment variables. The variable `TF_VAR_cluster_description` let's Terraform know how the file is called in which we stored our cluster configurations. 
+Now we need to set two environment variables. The variable `TF_VAR_cluster_description` lets Terraform know how the file is called in which we stored our cluster configurations. 
 
 ```shell
 export TF_VAR_cluster_description=cluster-test.yaml
@@ -20,7 +20,7 @@ The variable `TF_VAR_ionos_token` should contain our token for the authenticatio
 export TF_VAR_ionos_token=<yourToken>
 ```
 
->**Info:** If you plan to run Terraform in a pipeline instead of locally you would store the variales `TF_VAR_cluster_description` and `TF_VAR_ionos_token` in your Gitlab or Github variables in your repo.
+> **Info:** If you plan to run Terraform in a pipeline instead of running it locally you would store the variales `TF_VAR_cluster_description` and `TF_VAR_ionos_token` in your Gitlab or GitHub variables in your repository.
 
 ## Run Terraform (locally)
 
@@ -34,8 +34,17 @@ Then run your typical Terraform commands.
 
 ```shell
 terraform init
+```
+
+```shell
 terraform validate
+```
+
+```shell
 terraform plan
+```
+
+```shell
 terraform apply
 ```
 
@@ -45,7 +54,7 @@ For destroying your cluster again use this command:
 terraform destroy
 ```
 
->**Info:** You can run the same commands in the same order in your Gitlab pipeline or Github action and maybe separate them into different stages / jobs.
+> **Info:** You can run the same commands in the same order in your Gitlab pipeline or GitHub action and maybe separate them into different stages / jobs.
 
 ### Other ways to manage your MSDP clusters
 
@@ -78,21 +87,29 @@ For the prerequisites we are installing a Postgres database using a helm chart.
 helm install pg-superset -f prerequisites/pg-superset.yaml oci://registry-1.docker.io/bitnamicharts/postgresql
 ```
 
+> As soon as MSDP allows for a LAN connection to be defined during nodepool creation this should be replaced with a Managed Postgres available through the IONOS DBaaS offerings.
+
 ## Example deployment
 
-To perform an example deployment using the Superset operator we can simply pass the custom resources like so:
+To perform an example deployment using the Superset operator we can simply pass the custom resource like so:
 
 ```shell
 kubectl apply -f resources/superset.yaml
 ```
 
-To visit the Superset UI simply run `stackablectl services list` to get the correct endpoint. For more infos on stackablectl visit https://github.com/stackabletech/stackablectl.
+To visit the Superset UI simply run `stackablectl services list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackablectl).
+
+> To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release verion** - the version is defined in the Terraform configuration file.
 
 ## Tidying up
+
+This command will delete the Kubernetes secret and the SupersetCluster resource which will then trigger the operator to remove the Superset deployment.
 
 ```shell
 kubectl delete -f resources/superset.yaml
 ```
+
+To delete the Postgres and its PVC use the following two commands:
 
 ```shell
 helm delete pg-superset
