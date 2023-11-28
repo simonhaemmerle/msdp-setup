@@ -87,6 +87,7 @@ terraform destroy
   ```
   ```shell
   ionosctl dataplatform cluster kubeconfig \
+    --output json \
     --cluster-id <your-cluster-id>
   ```
   These are the steps to destroy everything again:
