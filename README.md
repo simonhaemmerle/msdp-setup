@@ -17,7 +17,7 @@ export TF_VAR_cluster_description=cluster-test.yaml
 The variable `TF_VAR_ionos_token` should contain our token for the authentication against the IONOS API.
 
 ```shell
-export TF_VAR_ionos_token=<yourToken>
+export TF_VAR_ionos_token=<your-token>
 ```
 
 > **Info:** If you plan to run Terraform in a pipeline instead of running it locally you would store the variales `TF_VAR_cluster_description` and `TF_VAR_ionos_token` in your Gitlab or GitHub variables in your repository.
@@ -58,12 +58,56 @@ terraform destroy
 
 ### Other ways to manage your MSDP clusters
 
-- [ionosctl](https://docs.ionos.com/cli-ionosctl/subcommands/managed-stackable-data-platform)
-- [OpenAPI specification](https://api.ionos.com/docs/dataplatform/v1/)
+- As an <ins>**alternative**</ins> to creating a cluster via Terraform this would be the necessary steps to create one with [ionosctl](https://docs.ionos.com/cli-ionosctl/subcommands/managed-stackable-data-platform):
+  ```shell
+  ionosctl login
+  ```
+  ```shell
+  ionosctl datacenter create \
+    --name MSDP_TEST \
+    --location de/fra
+  ```
+  ```shell
+  ionosctl dataplatform cluster create \
+    --name MSDP_TEST \
+    --version 23.7 \
+    --maintenance-day Monday \
+    --maintenance-time 16:30:59 \
+    --datacenter-id <your-datacenter-id>
+  ```
+  ```shell
+  ionosctl dataplatform nodepool create \
+    --name MSDP_TEST \
+    --node-count 3 \
+    --cores 4 \
+    --ram 8192 \
+    --storage-size 100 \
+    --storage-type SSD \
+    --cluster-id <your-cluster-id>
+  ```
+  ```shell
+  ionosctl dataplatform cluster kubeconfig \
+    --cluster-id <your-cluster-id>
+  ```
+  These are the steps to destroy everything again:
+  ```shell
+  ionosctl dataplatform nodepool delete \
+    --cluster-id <your-cluster-id> \
+    --nodepool-id <your-nodepool-id>
+  ```
+  ```shell
+  ionosctl dataplatform cluster delete \
+    --cluster-id <your-cluster-id>
+  ```
+  ```shell
+  ionosctl datacenter delete \
+    --datacenter-id <your-datacenter-id>
+  ```
+- Another option would be to leverage the MSDP [OpenAPI specification](https://api.ionos.com/docs/dataplatform/v1/) - for example with the API client of your choice ([Postman](https://www.postman.com/), [Insomnia](https://github.com/Kong/insomnia) or other).
 
 ## Accessing the MSDP cluster
 
-After following the steps above you should find a `kubeconfig.yaml` in the `terraform` folder of your local respository.
+After following the steps for Terraform above you should find a `kubeconfig.yaml` in the `terraform` folder of your local respository.
 
 > Letting Terraform write a kubeconfig file to your local machine poses a potential security risk. Please use with caution.
 
@@ -101,7 +145,7 @@ To visit the Superset UI simply run `stackablectl services list` to get the corr
 
 > To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release verion** - the version is defined in the Terraform configuration file.
 
-## Tidying up
+### Tidying up
 
 This command will delete the Kubernetes secret and the SupersetCluster resource which will then trigger the operator to remove the Superset deployment.
 

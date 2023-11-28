@@ -10,6 +10,7 @@ stringData:
   adminUser.email: admin@superset.com
   adminUser.password: admin
   connections.secretKey: thisISaSECRET_1234
+  # The information provided here (regarding database, username and password) needs to line up with your helm values
   connections.sqlalchemyDatabaseUri: postgresql://superset:pw123@pg-superset-postgresql-hl/superset
 ---
 apiVersion: superset.stackable.tech/v1alpha1
