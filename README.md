@@ -24,13 +24,13 @@ export TF_VAR_ionos_token=<your-token>
 
 ## Run Terraform (locally)
 
-Before running the Terraform command you need to navigate to the `terraform` folder.
+Before running the Terraform command you need to navigate to the `terraform` folder in your local repository.
 
 ```shell
 cd terraform
 ```
 
-Then run your typical Terraform commands.
+Then run your typical Terraform commands:
 
 ```shell
 terraform init
@@ -90,6 +90,13 @@ terraform destroy
     --output json \
     --cluster-id <your-cluster-id>
   ```
+  To store the kubeconfig directly to a file you could do something like this:
+  ```shell
+  ionosctl dataplatform cluster kubeconfig \
+    --output json \
+    --cluster-id <your-cluster-id> \
+    > kubeconfig.json
+  ```
   These are the steps to destroy everything again:
   ```shell
   ionosctl dataplatform nodepool delete \
@@ -108,17 +115,17 @@ terraform destroy
 
 ## Accessing the MSDP cluster
 
-After following the steps for Terraform above you should find a `kubeconfig.yaml` in the `terraform` folder of your local respository.
+After following the steps for Terraform above you should find a `kubeconfig.yaml` file in the `terraform` folder of your local respository.
 
 > Letting Terraform write a kubeconfig file to your local machine poses a potential security risk. Please use with caution.
 
-Tools like [*kubectl*](https://kubernetes.io/docs/tasks/tools/), [*k9s*](https://github.com/derailed/k9s), [*helm*](https://helm.sh/) and others need to work in the correct context to address the correct Kubernetes cluster. An easy way to set this context is to define the environment variable `$KUBECONFIG` and let it point to the `kubeconfig.yaml`.
+Tools like [*kubectl*](https://kubernetes.io/docs/tasks/tools/), [*k9s*](https://github.com/derailed/k9s), [*helm*](https://helm.sh/) and others need to work in the correct context to address the correct Kubernetes cluster. An easy way to set this context is to define the environment variable `KUBECONFIG` and let it point to the `kubeconfig.yaml`.
 
 ```shell
 export KUBECONFIG=${PWD}/terraform/kubeconfig.yaml
 ```
 
-You can validate if you can access your MSDP cluster by starting `k9s` or by doing something simple like listing the nodes of the cluster:
+You can validate if you can access your MSDP cluster by starting `k9s` or by doing something trivial like listing the nodes of the cluster:
 
 ```shell
 kubectl get nodes
@@ -144,7 +151,7 @@ kubectl apply -f resources/superset.yaml
 
 To visit the Superset UI simply run `stackablectl services list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackablectl).
 
-> To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release verion** - the version is defined in the Terraform configuration file.
+> To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release version** - the version is defined in the Terraform configuration file.
 
 ### Tidying up
 
@@ -159,7 +166,44 @@ To delete the Postgres and its PVC use the following two commands:
 ```shell
 helm delete pg-superset
 ```
+> <ins>**Use with caution!**</ins> This deletes all PVCs on the cluster.
 
 ```shell
 kubectl delete pvc --all
+```
+
+## Using stackablectl demos ond MSDP clusters
+
+[stackablectl](https://github.com/stackabletech/stackablectl) allows for complete demos with end-to-end dataflows to be installed with a single command.
+
+As stackablectl is meant to work with vanilla Kubernetes clusters (that do not have the Stackable distribution and its operators per-installed) we need to use the flag `--additional-releases-file` to skip the operator installation.
+
+This is how you would install the [nifi-kafka-druid-water-level-data](https://docs.stackable.tech/home/stable/demos/nifi-kafka-druid-water-level-data) demo:
+
+```shell
+stackablectl --additional-releases-file stackablectl/skip-operator-installation.yaml demo install nifi-kafka-druid-water-level-data
+```
+
+We can now monitor the demo deployments with `k9s`. As soon as all pods are running we can get the endpoints and connect to the tools via:
+
+```shell
+stackableclt services list
+```
+
+> You can find more demos in the [official documentation](https://docs.stackable.tech/home/stable/demos/).
+
+### Tidying up
+
+As there is a lot to tidy up after installing a demo it's best to use a little script to help us.
+
+> <ins>**Use with caution!**</ins> This basically resets your cluster entirely.
+
+```shell
+./stackablectl/cleanup_bruteforce.sh
+```
+
+Maybe you need to make the script executable first:
+
+```shell
+chmod u+x stackablectl/cleanup_bruteforce.sh
 ```
