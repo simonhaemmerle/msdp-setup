@@ -172,7 +172,7 @@ helm delete pg-superset
 kubectl delete pvc --all
 ```
 
-## Using stackablectl demos ond MSDP clusters
+## Using stackablectl demos on MSDP clusters
 
 [stackablectl](https://github.com/stackabletech/stackablectl) allows for complete demos with end-to-end dataflows to be installed with a single command.
 
