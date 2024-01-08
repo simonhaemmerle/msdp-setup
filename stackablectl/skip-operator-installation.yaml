@@ -1,5 +1,5 @@
 releases:
-  23.7:
-    releaseDate: &latest-release-release-date 2023-07-26
+  23.11:
+    releaseDate: &latest-release-release-date 2023-11-30
     description: NOP
     products: {}

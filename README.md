@@ -6,7 +6,7 @@ Before starting it is recommeded to have [ionosctl](https://github.com/ionos-clo
 
 You also need to make sure that the user you plan to use for terraforming is either a contract owner, an administrator or a users with the Manage Dataplatform permission (as documented [here](https://docs.ionos.com/cloud/managed-services/managed-stackable/how-tos/initial-cluster-setup)).
 
-Then run `ionosctl login` to login with your credentials and `ionosctl token generate` to retrieve a token.
+Then run `ionosctl login` to login with your credentials.
 
 Now we need to set two environment variables. The variable `TF_VAR_cluster_description` lets Terraform know how the file is called in which we stored our cluster configurations. 
 
@@ -14,10 +14,10 @@ Now we need to set two environment variables. The variable `TF_VAR_cluster_descr
 export TF_VAR_cluster_description=cluster-test.yaml
 ```
 
-The variable `TF_VAR_ionos_token` should contain our token for the authentication against the IONOS API.
+The variable `TF_VAR_ionos_token` should contain our token for the authentication against the IONOS API. To retrieve a token we can run `ionosctl token generate`. This command will retrieve the token and directly store it in the environment variable:
 
 ```shell
-export TF_VAR_ionos_token=<your-token>
+export TF_VAR_ionos_token=$(ionosctl token generate)
 ```
 
 > **Info:** If you plan to run Terraform in a pipeline instead of running it locally you would store the variales `TF_VAR_cluster_description` and `TF_VAR_ionos_token` in your Gitlab or GitHub variables in your repository.
@@ -70,7 +70,7 @@ terraform destroy
   ```shell
   ionosctl dataplatform cluster create \
     --name MSDP_TEST \
-    --version 23.7 \
+    --version 23.11 \
     --maintenance-day Monday \
     --maintenance-time 16:30:59 \
     --datacenter-id <your-datacenter-id>
@@ -149,7 +149,7 @@ To perform an example deployment using the Superset operator we can simply pass 
 kubectl apply -f resources/superset.yaml
 ```
 
-To visit the Superset UI simply run `stackablectl services list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackablectl).
+To visit the Superset UI simply run `stackablectl stacklet list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackablectl).
 
 > To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release version** - the version is defined in the Terraform configuration file.
 
@@ -181,13 +181,13 @@ As stackablectl is meant to work with vanilla Kubernetes clusters (that do not h
 This is how you would install the [nifi-kafka-druid-water-level-data](https://docs.stackable.tech/home/stable/demos/nifi-kafka-druid-water-level-data) demo:
 
 ```shell
-stackablectl --additional-releases-file stackablectl/skip-operator-installation.yaml demo install nifi-kafka-druid-water-level-data
+stackablectl --release-file stackablectl/skip-operator-installation.yaml demo install nifi-kafka-druid-water-level-data
 ```
 
 We can now monitor the demo deployments with `k9s`. As soon as all pods are running we can get the endpoints and connect to the tools via:
 
 ```shell
-stackableclt services list
+stackableclt stacklet list
 ```
 
 > You can find more demos in the [official documentation](https://docs.stackable.tech/home/stable/demos/).
@@ -199,11 +199,11 @@ As there is a lot to tidy up after installing a demo it's best to use a little s
 > <ins>**Use with caution!**</ins> This basically resets your cluster entirely.
 
 ```shell
-./stackablectl/cleanup_bruteforce.sh
+./stackablectl/cleanup-bruteforce.sh
 ```
 
 Maybe you need to make the script executable first:
 
 ```shell
-chmod u+x stackablectl/cleanup_bruteforce.sh
+chmod u+x stackablectl/cleanup-bruteforce.sh
 ```
