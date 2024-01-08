@@ -6,7 +6,11 @@ Before starting it is recommeded to have [ionosctl](https://github.com/ionos-clo
 
 You also need to make sure that the user you plan to use for terraforming is either a contract owner, an administrator or a users with the Manage Dataplatform permission (as documented [here](https://docs.ionos.com/cloud/managed-services/managed-stackable/how-tos/initial-cluster-setup)).
 
-Then run `ionosctl login` to login with your credentials.
+Then run this command in your terminal to login with your credentials.
+
+```shell
+ionosctl login
+```
 
 Now we need to set two environment variables. The variable `TF_VAR_cluster_description` lets Terraform know how the file is called in which we stored our cluster configurations. 
 
@@ -149,7 +153,7 @@ To perform an example deployment using the Superset operator we can simply pass 
 kubectl apply -f resources/superset.yaml
 ```
 
-To visit the Superset UI simply run `stackablectl stacklet list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackablectl).
+To visit the Superset UI simply run `stackablectl stacklet list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackable-cockpit/blob/main/rust/stackablectl/README.md).
 
 > To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release version** - the version is defined in the Terraform configuration file.
 
@@ -174,14 +178,14 @@ kubectl delete pvc --all
 
 ## Using stackablectl demos on MSDP clusters
 
-[stackablectl](https://github.com/stackabletech/stackablectl) allows for complete demos with end-to-end dataflows to be installed with a single command.
+[stackablectl](https://github.com/stackabletech/stackable-cockpit/blob/main/rust/stackablectl/README.md) allows for complete demos with end-to-end dataflows to be installed with a single command.
 
-As stackablectl is meant to work with vanilla Kubernetes clusters (that do not have the Stackable distribution and its operators per-installed) we need to use the flag `--additional-releases-file` to skip the operator installation.
+As stackablectl is meant to work with vanilla Kubernetes clusters (that do not have the Stackable distribution and its operators pre-installed) we need to use the argument `--skip-release` to skip the operator installation.
 
 This is how you would install the [nifi-kafka-druid-water-level-data](https://docs.stackable.tech/home/stable/demos/nifi-kafka-druid-water-level-data) demo:
 
 ```shell
-stackablectl --release-file stackablectl/skip-operator-installation.yaml demo install nifi-kafka-druid-water-level-data
+stackablectl demo install --skip-release nifi-kafka-druid-water-level-data
 ```
 
 We can now monitor the demo deployments with `k9s`. As soon as all pods are running we can get the endpoints and connect to the tools via:
