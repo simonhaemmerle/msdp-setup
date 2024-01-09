@@ -4,7 +4,7 @@
 
 Before starting it is recommeded to have [ionosctl](https://github.com/ionos-cloud/ionosctl#getting-started) running on your machine.
 
-You also need to make sure that the user you plan to use for terraforming is either a contract owner, an administrator or a users with the Manage Dataplatform permission (as documented [here](https://docs.ionos.com/cloud/managed-services/managed-stackable/how-tos/initial-cluster-setup)).
+You also need to make sure that the user you plan to use for terraforming is either a contract owner, an administrator or a user with the Manage Dataplatform permission (as documented [here](https://docs.ionos.com/cloud/managed-services/managed-stackable/how-tos/initial-cluster-setup)).
 
 Then run this command in your terminal to login with your credentials.
 
@@ -51,6 +51,8 @@ terraform plan
 ```shell
 terraform apply
 ```
+
+After *approximately* 20 minutes your cluster and nodepool should be ready to use.
 
 For destroying your cluster again use this command:
 
@@ -153,7 +155,7 @@ To perform an example deployment using the Superset operator we can simply pass 
 kubectl apply -f resources/superset.yaml
 ```
 
-To visit the Superset UI simply run `stackablectl stacklet list` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackable-cockpit/blob/main/rust/stackablectl/README.md).
+To visit the Superset UI simply run `stackablectl stacklet list -n default` to get the correct endpoint. For more information on stackablectl - a Stackable-native command-line tool - visit [this GitHub repository](https://github.com/stackabletech/stackable-cockpit/blob/main/rust/stackablectl/README.md).
 
 > To find resource blueprints please visit either the [official documentation](https://docs.stackable.tech/home/stable/operators/) or the [Stackable GitHub repositories](https://github.com/stackabletech). Please make sure to use resources for the **correct Stackable release version** - the version is defined in the Terraform configuration file.
 
@@ -191,7 +193,7 @@ stackablectl demo install --skip-release nifi-kafka-druid-water-level-data
 We can now monitor the demo deployments with `k9s`. As soon as all pods are running we can get the endpoints and connect to the tools via:
 
 ```shell
-stackableclt stacklet list
+stackableclt stacklet list -n default
 ```
 
 > You can find more demos in the [official documentation](https://docs.stackable.tech/home/stable/demos/).
